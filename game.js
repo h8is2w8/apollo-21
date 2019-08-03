@@ -5,21 +5,18 @@ const CANVAS_WIDTH = 800;
 const CANVAS_HEIGHT = 800;
 const WORLD_WIDTH = CANVAS_WIDTH / 2;
 const WORLD_HEIGHT = CANVAS_HEIGHT / 2;
-const SUN_RADIUS = 25;
-const SUN_X_POS = WORLD_WIDTH / 2
-const SUN_Y_POS = WORLD_HEIGHT / 2
-const SUN_COLOR = 'orange';
-const SUN_ORBIT_RADIUS = SUN_RADIUS * 2.5;
+
+const SUN   = { radius: 25, color: 'orange' }
+const EARTH = { radius: 8,  color: 'blue' }
+const MARS  = { radius: 12, color: 'brown' }
+const VENUS = { radius: 6,  color: 'red' }
+const MOON  = { radius: 4,  color: 'grey' }
+
+const SUN_POS = { x: WORLD_WIDTH / 2, y: WORLD_HEIGHT / 2 }
+const SUN_ORBIT_RADIUS = SUN.radius * 2.5;
 const SUN_ORBIT_COLOR = 'black';
-const EARTH_RADIUS = 8;
-const EARTH_COLOR = 'blue';
 const EARTH_ORBIT_RADIUS = 5;
-const MARS_RADIUS = 12;
-const MARS_COLOR = 'brown';
-const VENUS_RADIUS = 8;
-const VENUS_COLOR = 'red';
-const MOON_RADIUS = 4;
-const MOON_COLOR = "grey";
+
 
 // Preset World
 const CANVAS = document.getElementById('canvas');
@@ -59,8 +56,8 @@ function clearWorld() {
 function drawOrbits(n) {
   for (let i = 0; i < n; i++) {
     drawCircle(
-      SUN_X_POS, SUN_Y_POS,
-      SUN_ORBIT_RADIUS + (SUN_RADIUS + 5) * i,
+      SUN_POS.x, SUN_POS.y,
+      SUN_ORBIT_RADIUS + (SUN.radius + 5) * i,
       SUN_ORBIT_COLOR,
       false
     );
@@ -93,16 +90,20 @@ function drawGrid(x1, x2, y1, y2, n) {
   drawGrid(midX, x2, midY, y2, n - 1); // 4rd square
 }
 
+function drawCelestialBody(obj, pos) {
+  drawCircle(pos.x, pos.y, obj.radius, obj.color, true);
+}
+
 // draws world
 function draw(ws) {
   clearWorld();
-  drawCircle(SUN_X_POS, SUN_Y_POS, SUN_RADIUS, SUN_COLOR, true);
+  drawCelestialBody(SUN, SUN_POS);
   drawOrbits(3);
   let ss = calcSolarSystemPos(ws);
-  drawCircle(ss.venusPos.x, ss.venusPos.y, VENUS_RADIUS, VENUS_COLOR, true);
-  drawCircle(ss.earthPos.x, ss.earthPos.y, EARTH_RADIUS, EARTH_COLOR, true);
-  drawCircle(ss.marsPos.x, ss.marsPos.y, MARS_RADIUS, MARS_COLOR, true);
-  drawCircle(ss.moonPos.x, ss.moonPos.y, MOON_RADIUS, MOON_COLOR, true);
+  drawCelestialBody(VENUS, ss.venusPos);
+  drawCelestialBody(EARTH, ss.earthPos);
+  drawCelestialBody(MOON, ss.moonPos);
+  drawCelestialBody(MARS, ss.marsPos);
   // drawGrid(0, WORLD_WIDTH, 0, WORLD_HEIGHT, 3);
 }
 
@@ -111,7 +112,7 @@ function radToDeg(rad) {
   return rad * 180 / Math.PI;
 }
 
-// calcs planet position given gravity center x,y, radis r, time t
+// calcs planet position given gravity center x,y, radius r, time t
 function planetPos(x, y, r, time) {
   return {
     x: x + r * Math.sin(radToDeg(time)),
@@ -121,12 +122,12 @@ function planetPos(x, y, r, time) {
 
 // calcs celestial bodies position in Solar System from ws
 function calcSolarSystemPos(ws) {
-  let earthPos = planetPos(SUN_X_POS, SUN_Y_POS, 30 + SUN_ORBIT_RADIUS, ws / 15000.0);
+  let earthPos = planetPos(SUN_POS.x, SUN_POS.y, 30 + SUN_ORBIT_RADIUS, ws / 15000.0);
 
   return {
     earthPos: earthPos,
-    venusPos: planetPos(SUN_X_POS, SUN_Y_POS, SUN_ORBIT_RADIUS, ws / 10000.0),
-    marsPos: planetPos(SUN_X_POS, SUN_Y_POS, 60 + SUN_ORBIT_RADIUS, ws / 20000.0),
+    venusPos: planetPos(SUN_POS.x, SUN_POS.y, SUN_ORBIT_RADIUS, ws / 10000.0),
+    marsPos: planetPos(SUN_POS.x, SUN_POS.y, 60 + SUN_ORBIT_RADIUS, ws / 20000.0),
     moonPos: planetPos(earthPos.x, earthPos.y, 10 + EARTH_ORBIT_RADIUS, ws / 5000.0)
   };
 }
