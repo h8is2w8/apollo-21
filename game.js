@@ -9,10 +9,17 @@ const SUN_RADIUS = 25;
 const SUN_X_POS = WORLD_WIDTH / 2
 const SUN_Y_POS = WORLD_HEIGHT / 2
 const SUN_COLOR = 'orange';
-const SUN_ORBIT_RADIUS = SUN_RADIUS * 2;
+const SUN_ORBIT_RADIUS = SUN_RADIUS * 2.5;
 const SUN_ORBIT_COLOR = 'black';
-const EARTH_RADIUS = 5;
+const EARTH_RADIUS = 8;
 const EARTH_COLOR = 'blue';
+const EARTH_ORBIT_RADIUS = 5;
+const MARS_RADIUS = 12;
+const MARS_COLOR = 'brown';
+const VENUS_RADIUS = 8;
+const VENUS_COLOR = 'red';
+const MOON_RADIUS = 4;
+const MOON_COLOR = "grey";
 
 // Preset World
 const CANVAS = document.getElementById('canvas');
@@ -53,7 +60,7 @@ function drawOrbits(n) {
   for (var i = 0; i < n; i++) {
     drawCircle(
       SUN_X_POS, SUN_Y_POS,
-      SUN_ORBIT_RADIUS + SUN_RADIUS * i,
+      SUN_ORBIT_RADIUS + (SUN_RADIUS + 5) * i,
       SUN_ORBIT_COLOR,
       false
     );
@@ -90,9 +97,12 @@ function drawGrid(x1, x2, y1, y2, n) {
 function draw(ws) {
   clearWorld();
   drawCircle(SUN_X_POS, SUN_Y_POS, SUN_RADIUS, SUN_COLOR, true);
-  drawOrbits(2);
-  drawCircle(ws.x, ws.y, EARTH_RADIUS, EARTH_COLOR, true);
-  drawGrid(0, WORLD_WIDTH, 0, WORLD_HEIGHT, 3);
+  drawOrbits(3);
+  drawCircle(ws.venusPos.x, ws.venusPos.y, VENUS_RADIUS, VENUS_COLOR, true);
+  drawCircle(ws.earthPos.x, ws.earthPos.y, EARTH_RADIUS, EARTH_COLOR, true);
+  drawCircle(ws.marsPos.x, ws.marsPos.y, MARS_RADIUS, MARS_COLOR, true);
+  drawCircle(ws.moonPos.x, ws.moonPos.y, MOON_RADIUS, MOON_COLOR, true);
+  // drawGrid(0, WORLD_WIDTH, 0, WORLD_HEIGHT, 3);
 }
 
 // converts radians to degrees
@@ -100,11 +110,23 @@ function radToDeg(rad) {
   return rad * 180 / Math.PI;
 }
 
-// changes Earth position
-function tick(time) {
+// calcs planet position center x,y, time t, radis r,
+function planetPos(x, y, r, time) {
   return {
-    x: SUN_X_POS + SUN_ORBIT_RADIUS * Math.sin(radToDeg(time / 100000.0)),
-    y: SUN_Y_POS + SUN_ORBIT_RADIUS * Math.cos(radToDeg(time / 100000.0))
+    x: x + r * Math.sin(radToDeg(time)),
+    y: y + r * Math.cos(radToDeg(time))
+  }
+}
+
+// changes planets position
+function tick(time) {
+  let earthPos = planetPos(SUN_X_POS, SUN_Y_POS, 30 + SUN_ORBIT_RADIUS, time / 150000.0);
+
+  return {
+    earthPos: earthPos,
+    venusPos: planetPos(SUN_X_POS, SUN_Y_POS, SUN_ORBIT_RADIUS, time / 100000.0),
+    marsPos: planetPos(SUN_X_POS, SUN_Y_POS, 60 + SUN_ORBIT_RADIUS, time / 200000.0),
+    moonPos: planetPos(earthPos.x, earthPos.y, 10 + EARTH_ORBIT_RADIUS, time / 50000.0)
   };
 }
 
@@ -117,8 +139,11 @@ function bigBang(ws, onDraw, onTick) {
   });
 }
 
-bigBang(
-  { x: SUN_X_POS, y: SUN_Y_POS + SUN_ORBIT_RADIUS },
-  draw,
-  tick
-);
+var gameState = {
+  venusPos:  { x: SUN_X_POS, y: SUN_Y_POS + SUN_ORBIT_RADIUS + 30 },
+  earthPos:  { x: SUN_X_POS, y: SUN_Y_POS + SUN_ORBIT_RADIUS + 60 },
+  marsPos:   { x: SUN_X_POS, y: SUN_Y_POS + SUN_ORBIT_RADIUS + 90 },
+  moonPos:   { x: SUN_X_POS, y: SUN_Y_POS + SUN_ORBIT_RADIUS + 60 }
+}
+
+bigBang(gameState, draw, tick);
