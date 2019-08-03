@@ -57,7 +57,7 @@ function clearWorld() {
 
 // draws multiple orbits given n
 function drawOrbits(n) {
-  for (var i = 0; i < n; i++) {
+  for (let i = 0; i < n; i++) {
     drawCircle(
       SUN_X_POS, SUN_Y_POS,
       SUN_ORBIT_RADIUS + (SUN_RADIUS + 5) * i,
@@ -70,8 +70,8 @@ function drawOrbits(n) {
 function drawGrid(x1, x2, y1, y2, n) {
   if (n == 0) { return }
 
-  var midX = x1 + (x2 - x1) / 2;
-  var midY = y1 + (y2 - y1) / 2;
+  let midX = x1 + (x2 - x1) / 2;
+  let midY = y1 + (y2 - y1) / 2;
 
   CTX.strokeStyle = 'grey';
 
@@ -93,15 +93,16 @@ function drawGrid(x1, x2, y1, y2, n) {
   drawGrid(midX, x2, midY, y2, n - 1); // 4rd square
 }
 
-// draws world given WS
+// draws world
 function draw(ws) {
   clearWorld();
   drawCircle(SUN_X_POS, SUN_Y_POS, SUN_RADIUS, SUN_COLOR, true);
   drawOrbits(3);
-  drawCircle(ws.venusPos.x, ws.venusPos.y, VENUS_RADIUS, VENUS_COLOR, true);
-  drawCircle(ws.earthPos.x, ws.earthPos.y, EARTH_RADIUS, EARTH_COLOR, true);
-  drawCircle(ws.marsPos.x, ws.marsPos.y, MARS_RADIUS, MARS_COLOR, true);
-  drawCircle(ws.moonPos.x, ws.moonPos.y, MOON_RADIUS, MOON_COLOR, true);
+  let ss = calcSolarSystemPos(ws);
+  drawCircle(ss.venusPos.x, ss.venusPos.y, VENUS_RADIUS, VENUS_COLOR, true);
+  drawCircle(ss.earthPos.x, ss.earthPos.y, EARTH_RADIUS, EARTH_COLOR, true);
+  drawCircle(ss.marsPos.x, ss.marsPos.y, MARS_RADIUS, MARS_COLOR, true);
+  drawCircle(ss.moonPos.x, ss.moonPos.y, MOON_RADIUS, MOON_COLOR, true);
   // drawGrid(0, WORLD_WIDTH, 0, WORLD_HEIGHT, 3);
 }
 
@@ -110,7 +111,7 @@ function radToDeg(rad) {
   return rad * 180 / Math.PI;
 }
 
-// calcs planet position center x,y, time t, radis r,
+// calcs planet position given gravity center x,y, radis r, time t
 function planetPos(x, y, r, time) {
   return {
     x: x + r * Math.sin(radToDeg(time)),
@@ -118,32 +119,29 @@ function planetPos(x, y, r, time) {
   }
 }
 
-// changes planets position
-function tick(time) {
-  let earthPos = planetPos(SUN_X_POS, SUN_Y_POS, 30 + SUN_ORBIT_RADIUS, time / 150000.0);
+// calcs celestial bodies position in Solar System from ws
+function calcSolarSystemPos(ws) {
+  let earthPos = planetPos(SUN_X_POS, SUN_Y_POS, 30 + SUN_ORBIT_RADIUS, ws / 15000.0);
 
   return {
     earthPos: earthPos,
-    venusPos: planetPos(SUN_X_POS, SUN_Y_POS, SUN_ORBIT_RADIUS, time / 100000.0),
-    marsPos: planetPos(SUN_X_POS, SUN_Y_POS, 60 + SUN_ORBIT_RADIUS, time / 200000.0),
-    moonPos: planetPos(earthPos.x, earthPos.y, 10 + EARTH_ORBIT_RADIUS, time / 50000.0)
+    venusPos: planetPos(SUN_X_POS, SUN_Y_POS, SUN_ORBIT_RADIUS, ws / 10000.0),
+    marsPos: planetPos(SUN_X_POS, SUN_Y_POS, 60 + SUN_ORBIT_RADIUS, ws / 20000.0),
+    moonPos: planetPos(earthPos.x, earthPos.y, 10 + EARTH_ORBIT_RADIUS, ws / 5000.0)
   };
+}
+
+// moves celestial bodies for every clock tick
+function tick(ws) {
+  return ws + 1;
 }
 
 // runs simulation
 function bigBang(ws, onDraw, onTick) {
-  requestAnimationFrame(function(time) {
+  requestAnimationFrame(function() {
     onDraw(ws);
-    var newWS = onTick(time);
-    bigBang(newWS, onDraw, onTick)
+    bigBang(onTick(ws), onDraw, onTick)
   });
 }
 
-var gameState = {
-  venusPos:  { x: SUN_X_POS, y: SUN_Y_POS + SUN_ORBIT_RADIUS + 30 },
-  earthPos:  { x: SUN_X_POS, y: SUN_Y_POS + SUN_ORBIT_RADIUS + 60 },
-  marsPos:   { x: SUN_X_POS, y: SUN_Y_POS + SUN_ORBIT_RADIUS + 90 },
-  moonPos:   { x: SUN_X_POS, y: SUN_Y_POS + SUN_ORBIT_RADIUS + 60 }
-}
-
-bigBang(gameState, draw, tick);
+bigBang(0, draw, tick);
