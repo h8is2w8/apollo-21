@@ -1,4 +1,3 @@
-// WorldState ?
 // Structs
 
 class Vec {
@@ -41,6 +40,9 @@ CANVAS.style.height = WORLD_HEIGHT + 'px';
 CANVAS.style.border = '1px solid black';
 CANVAS.getContext('2d').scale(2,2);
 
+// WorldState is a Number
+// interpreation: representing the number of clock ticks
+// since the simulation was started.
 
 // draws circle given
 // pos x, y
