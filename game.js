@@ -1,4 +1,16 @@
 // WorldState ?
+// Structs
+
+class Vec {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  plus(other) {
+    return new Vec(this.x + other.x, this.y + other.y);
+  }
+}
 
 // Constants
 const CANVAS_WIDTH = 800;
@@ -12,7 +24,7 @@ const MARS  = { radius: 12, color: 'brown' }
 const VENUS = { radius: 6,  color: 'red' }
 const MOON  = { radius: 4,  color: 'grey' }
 
-const SUN_POS = { x: WORLD_WIDTH / 2, y: WORLD_HEIGHT / 2 }
+const SUN_POS = new Vec(WORLD_WIDTH / 2, WORLD_HEIGHT / 2);
 const SUN_ORBIT_RADIUS = SUN.radius * 2.5;
 const SUN_ORBIT_COLOR = 'black';
 const EARTH_ORBIT_RADIUS = 5;
@@ -99,11 +111,11 @@ function draw(ws) {
   clearWorld();
   drawCelestialBody(SUN, SUN_POS);
   drawOrbits(3);
-  let ss = calcSolarSystemPos(ws);
-  drawCelestialBody(VENUS, ss.venusPos);
-  drawCelestialBody(EARTH, ss.earthPos);
-  drawCelestialBody(MOON, ss.moonPos);
-  drawCelestialBody(MARS, ss.marsPos);
+  drawCelestialBody(VENUS, planetPos(SUN_POS, SUN_ORBIT_RADIUS, ws / 10000.0));
+  let earthPos = planetPos(SUN_POS, 30 + SUN_ORBIT_RADIUS, ws / 15000.0);
+  drawCelestialBody(EARTH, earthPos);
+  drawCelestialBody(MOON, planetPos(earthPos, 10 + EARTH_ORBIT_RADIUS, ws / 5000.0));
+  drawCelestialBody(MARS, planetPos(SUN_POS, 60 + SUN_ORBIT_RADIUS, ws / 20000.0));
   // drawGrid(0, WORLD_WIDTH, 0, WORLD_HEIGHT, 3);
 }
 
@@ -112,24 +124,16 @@ function radToDeg(rad) {
   return rad * 180 / Math.PI;
 }
 
-// calcs planet position given gravity center x,y, radius r, time t
-function planetPos(x, y, r, time) {
-  return {
-    x: x + r * Math.sin(radToDeg(time)),
-    y: y + r * Math.cos(radToDeg(time))
-  }
-}
-
-// calcs celestial bodies position in Solar System from ws
-function calcSolarSystemPos(ws) {
-  let earthPos = planetPos(SUN_POS.x, SUN_POS.y, 30 + SUN_ORBIT_RADIUS, ws / 15000.0);
-
-  return {
-    earthPos: earthPos,
-    venusPos: planetPos(SUN_POS.x, SUN_POS.y, SUN_ORBIT_RADIUS, ws / 10000.0),
-    marsPos: planetPos(SUN_POS.x, SUN_POS.y, 60 + SUN_ORBIT_RADIUS, ws / 20000.0),
-    moonPos: planetPos(earthPos.x, earthPos.y, 10 + EARTH_ORBIT_RADIUS, ws / 5000.0)
-  };
+// Vec, Number, Number -> Vec
+// calcs planet position given
+// Barrycenter  bc
+// Orbit Radius r
+// Time         t
+function planetPos(bc, r, t) {
+  return new Vec(
+    bc.x + r * Math.sin(radToDeg(t)),
+    bc.y + r * Math.cos(radToDeg(t))
+  )
 }
 
 // moves celestial bodies for every clock tick
