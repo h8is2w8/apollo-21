@@ -11,17 +11,30 @@ class Vec {
   }
 }
 
+class CelestialObject {
+  constructor({ r, orbit_r, color, satellites = [] }) {
+    this.r = r;
+    this.orbit_r = orbit_r;
+    this.color = color;
+    this.satellites = satellites;
+  }
+}
+
+
 // Constants
 const CANVAS_WIDTH = 800;
 const CANVAS_HEIGHT = 800;
 const WORLD_WIDTH = CANVAS_WIDTH / 2;
 const WORLD_HEIGHT = CANVAS_HEIGHT / 2;
 
-const MOON  = { r: 5,  orbit_r: 1,  color: 'grey',   satellites: [] };
-const EARTH = { r: 10, orbit_r: 10, color: 'blue',   satellites: [MOON] };
-const VENUS = { r: 8,  orbit_r: 3,  color: 'red',    satellites: [] };
-const MARS  = { r: 12, orbit_r: 5,  color: 'brown',  satellites: [] };
-const SUN   = { r: 25, orbit_r: 40, color: 'orange', satellites: [VENUS, EARTH, MARS, null] };
+const MOON  = new CelestialObject({ r: 5,  orbit_r: 1,  color: 'grey' });
+const EARTH = new CelestialObject({ r: 10, orbit_r: 10, color: 'blue', satellites: [MOON] });
+const VENUS = new CelestialObject({ r: 8,  orbit_r: 3,  color: 'red' });
+const MARS  = new CelestialObject({ r: 12, orbit_r: 5,  color: 'brown' });
+const SUN   = new CelestialObject({
+  r: 25, orbit_r: 40, color: 'orange',
+  satellites: [VENUS, EARTH, MARS, null]
+});
 
 const SUN_POS = new Vec(WORLD_WIDTH / 2, WORLD_HEIGHT / 2);
 const ORBIT_COLOR = 'black';
