@@ -12,10 +12,11 @@ class Vec {
 }
 
 class CelestialObject {
-  constructor({ r, orbit_r, color, satellites = [] }) {
+  constructor({ r, orbit_r, color, drawOrbits = false, satellites = [] }) {
     this.r = r;
     this.orbit_r = orbit_r;
     this.color = color;
+    this.drawOrbits = drawOrbits;
     this.satellites = satellites;
   }
 }
@@ -28,11 +29,15 @@ const WORLD_WIDTH = CANVAS_WIDTH / 2;
 const WORLD_HEIGHT = CANVAS_HEIGHT / 2;
 
 const MOON  = new CelestialObject({ r: 5,  orbit_r: 1,  color: 'grey' });
-const EARTH = new CelestialObject({ r: 10, orbit_r: 10, color: 'blue', satellites: [MOON] });
 const VENUS = new CelestialObject({ r: 8,  orbit_r: 3,  color: 'red' });
 const MARS  = new CelestialObject({ r: 12, orbit_r: 5,  color: 'brown' });
+const EARTH = new CelestialObject({
+  r: 10, orbit_r: 10, color: 'blue',
+  drawOrbits: true, satellites: [MOON]
+});
 const SUN   = new CelestialObject({
   r: 25, orbit_r: 40, color: 'orange',
+  drawOrbits: true,
   satellites: [VENUS, EARTH, MARS, null]
 });
 
@@ -76,12 +81,12 @@ function clearWorld() {
   CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
 }
 
-// draws n orbits around the Sun
-function drawOrbits(n) {
-  for (let i = 1; i <= n; i++) {
+// draws orbits around an obj
+function drawOrbits(obj, pos) {
+  for (let i = 1; i <= obj.satellites.length; i++) {
     drawCircle(
-      SUN_POS.x, SUN_POS.y,
-      SUN.r + SUN.orbit_r * i,
+      pos.x, pos.y,
+      obj.r + obj.orbit_r * i,
       ORBIT_COLOR,
       false
     );
@@ -116,7 +121,9 @@ function drawGrid(x1, x2, y1, y2, n) {
 }
 
 function drawCelestialBody(obj, pos, ws) {
+  if (obj.drawOrbits) { drawOrbits(obj, pos) };
   drawCircle(pos.x, pos.y, obj.r, obj.color, true);
+
   obj.satellites.forEach(function(sat, i) {
     if (sat) {
       const distance = obj.r + obj.orbit_r * (i + 1);
@@ -131,7 +138,6 @@ function drawCelestialBody(obj, pos, ws) {
 // draws world from WorldState
 function draw(ws) {
   clearWorld();
-  drawOrbits(SUN.satellites.length);
   drawCelestialBody(SUN, SUN_POS, ws);
   // drawGrid(0, WORLD_WIDTH, 0, WORLD_HEIGHT, 3);
 }
