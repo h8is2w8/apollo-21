@@ -17,17 +17,14 @@ const CANVAS_HEIGHT = 800;
 const WORLD_WIDTH = CANVAS_WIDTH / 2;
 const WORLD_HEIGHT = CANVAS_HEIGHT / 2;
 
-const SUN   = { radius: 25, color: 'orange' }
-const EARTH = { radius: 8,  color: 'blue' }
-const MARS  = { radius: 12, color: 'brown' }
-const VENUS = { radius: 6,  color: 'red' }
-const MOON  = { radius: 4,  color: 'grey' }
+const MOON  = { r: 5,  orbit_r: 1,  color: 'grey',   satellites: [] };
+const EARTH = { r: 10, orbit_r: 10, color: 'blue',   satellites: [MOON] };
+const VENUS = { r: 8,  orbit_r: 3,  color: 'red',    satellites: [] };
+const MARS  = { r: 12, orbit_r: 5,  color: 'brown',  satellites: [] };
+const SUN   = { r: 25, orbit_r: 40, color: 'orange', satellites: [VENUS, EARTH, MARS, null] };
 
 const SUN_POS = new Vec(WORLD_WIDTH / 2, WORLD_HEIGHT / 2);
-const SUN_ORBIT_RADIUS = SUN.radius * 2.5;
-const SUN_ORBIT_COLOR = 'black';
-const EARTH_ORBIT_RADIUS = 5;
-
+const ORBIT_COLOR = 'black';
 
 // Preset World
 const CANVAS = document.getElementById('canvas');
@@ -66,20 +63,20 @@ function clearWorld() {
   CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
 }
 
-// draws multiple orbits given n
+// draws n orbits around the Sun
 function drawOrbits(n) {
-  for (let i = 0; i < n; i++) {
+  for (let i = 1; i <= n; i++) {
     drawCircle(
       SUN_POS.x, SUN_POS.y,
-      SUN_ORBIT_RADIUS + (SUN.radius + 5) * i,
-      SUN_ORBIT_COLOR,
+      SUN.r + SUN.orbit_r * i,
+      ORBIT_COLOR,
       false
     );
   }
 }
 
 function drawGrid(x1, x2, y1, y2, n) {
-  if (n == 0) { return }
+  if (n <= 0) { return; }
 
   let midX = x1 + (x2 - x1) / 2;
   let midY = y1 + (y2 - y1) / 2;
@@ -104,20 +101,24 @@ function drawGrid(x1, x2, y1, y2, n) {
   drawGrid(midX, x2, midY, y2, n - 1); // 4rd square
 }
 
-function drawCelestialBody(obj, pos) {
-  drawCircle(pos.x, pos.y, obj.radius, obj.color, true);
+function drawCelestialBody(obj, pos, ws) {
+  drawCircle(pos.x, pos.y, obj.r, obj.color, true);
+  obj.satellites.forEach(function(sat, i) {
+    if (sat) {
+      const distance = obj.r + obj.orbit_r * (i + 1);
+      const speed = ws / (5000.0 * (i + 1));
+      const sat_current_pos = satellitePos(pos, distance, speed);
+      drawCelestialBody(sat, sat_current_pos, ws * 5);
+    }
+  });
 }
 
-// draws world
+
+// draws world from WorldState
 function draw(ws) {
   clearWorld();
-  drawCelestialBody(SUN, SUN_POS);
-  drawOrbits(3);
-  drawCelestialBody(VENUS, planetPos(SUN_POS, SUN_ORBIT_RADIUS, ws / 10000.0));
-  let earthPos = planetPos(SUN_POS, 30 + SUN_ORBIT_RADIUS, ws / 15000.0);
-  drawCelestialBody(EARTH, earthPos);
-  drawCelestialBody(MOON, planetPos(earthPos, 10 + EARTH_ORBIT_RADIUS, ws / 5000.0));
-  drawCelestialBody(MARS, planetPos(SUN_POS, 60 + SUN_ORBIT_RADIUS, ws / 20000.0));
+  drawOrbits(SUN.satellites.length);
+  drawCelestialBody(SUN, SUN_POS, ws);
   // drawGrid(0, WORLD_WIDTH, 0, WORLD_HEIGHT, 3);
 }
 
@@ -127,27 +128,28 @@ function radToDeg(rad) {
 }
 
 // Vec, Number, Number -> Vec
-// calcs planet position given
+// calcs satellite position given
 // Barrycenter  bc
 // Orbit Radius r
 // Time         t
-function planetPos(bc, r, t) {
+function satellitePos(bc, r, t) {
   return new Vec(
     bc.x + r * Math.sin(radToDeg(t)),
     bc.y + r * Math.cos(radToDeg(t))
-  )
+  );
 }
 
-// moves celestial bodies for every clock tick
+// WorldState -> WorldState
+// computes the next WorldState for every clock tick
 function tick(ws) {
   return ws + 1;
 }
 
-// runs simulation
+// runs simulation from given WorldState
 function bigBang(ws, onDraw, onTick) {
   requestAnimationFrame(function() {
     onDraw(ws);
-    bigBang(onTick(ws), onDraw, onTick)
+    bigBang(onTick(ws), onDraw, onTick);
   });
 }
 
