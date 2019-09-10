@@ -55,10 +55,10 @@ CANVAS.getContext('2d').scale(2,2);
 // since the simulation was started.
 
 // draws circle given
-// pos x, y
-// raidus r
-// color c
-// fill circle f
+// Pos    x, y
+// Raidus r
+// Color  c
+// Fill circle flag f
 function drawCircle(x, y, r, c, f) {
   CTX.beginPath();
   CTX.arc(x, y, r, 0, 2 * Math.PI);
@@ -88,6 +88,7 @@ function drawOrbits(n) {
   }
 }
 
+// draws game grid with granularity n
 function drawGrid(x1, x2, y1, y2, n) {
   if (n <= 0) { return; }
 
@@ -135,6 +136,7 @@ function draw(ws) {
   // drawGrid(0, WORLD_WIDTH, 0, WORLD_HEIGHT, 3);
 }
 
+// Number -> Number
 // converts radians to degrees
 function radToDeg(rad) {
   return rad * 180 / Math.PI;
