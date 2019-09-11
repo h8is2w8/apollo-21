@@ -12,9 +12,9 @@ class Vec {
 }
 
 class CelestialObject {
-  constructor({ r, orbit_r, color, drawOrbits = false, satellites = [] }) {
+  constructor({ r, orbitR, color, drawOrbits = false, satellites = [] }) {
     this.r = r;
-    this.orbit_r = orbit_r;
+    this.orbitR = orbitR;
     this.color = color;
     this.drawOrbits = drawOrbits;
     this.satellites = satellites;
@@ -28,15 +28,15 @@ const CANVAS_HEIGHT = 800;
 const WORLD_WIDTH = CANVAS_WIDTH / 2;
 const WORLD_HEIGHT = CANVAS_HEIGHT / 2;
 
-const MOON  = new CelestialObject({ r: 5,  orbit_r: 1,  color: 'grey' });
-const VENUS = new CelestialObject({ r: 8,  orbit_r: 3,  color: 'red' });
-const MARS  = new CelestialObject({ r: 12, orbit_r: 5,  color: 'brown' });
+const MOON  = new CelestialObject({ r: 5,  orbitR: 1, color: 'grey'  });
+const VENUS = new CelestialObject({ r: 8,  orbitR: 3, color: 'red'   });
+const MARS  = new CelestialObject({ r: 12, orbitR: 5, color: 'brown' });
 const EARTH = new CelestialObject({
-  r: 10, orbit_r: 10, color: 'blue',
+  r: 10, orbitR: 10, color: 'blue',
   drawOrbits: true, satellites: [MOON]
 });
 const SUN   = new CelestialObject({
-  r: 25, orbit_r: 40, color: 'orange',
+  r: 25, orbitR: 40, color: 'orange',
   drawOrbits: true,
   satellites: [VENUS, EARTH, MARS, null]
 });
@@ -86,7 +86,7 @@ function drawOrbits(obj, pos) {
   for (let i = 1; i <= obj.satellites.length; i++) {
     drawCircle(
       pos.x, pos.y,
-      obj.r + obj.orbit_r * i,
+      obj.r + obj.orbitR * i,
       ORBIT_COLOR,
       false
     );
@@ -126,7 +126,7 @@ function drawCelestialBody(obj, pos, ws) {
 
   obj.satellites.forEach(function(sat, i) {
     if (sat) {
-      const distance = obj.r + obj.orbit_r * (i + 1);
+      const distance = obj.r + obj.orbitR * (i + 1);
       const speed = ws / (5000.0 * (i + 1));
       const sat_current_pos = satellitePos(pos, distance, speed);
       drawCelestialBody(sat, sat_current_pos, ws * 5);
