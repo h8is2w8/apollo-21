@@ -43,7 +43,7 @@ class CelestialObject {
 // - pos is a Vec
 // - v is a Vec
 class Rocket {
-  constructor(pos, v) {
+  constructor({ pos, v }) {
     this.pos = pos;
     this.v = v;
   }
@@ -54,10 +54,11 @@ class Rocket {
 // - player is a Rocket
 // - time is a Number
 class WorldState {
-  constructor(sun, player, time) {
+  constructor({ sun, player, time, drawGrid = false }) {
     this.sun = sun;
     this.player = player;
     this.time = time;
+    this.drawGrid = drawGrid;
 
     moveSolarSystem(this.sun, time);
   }
@@ -93,7 +94,10 @@ function satellitePos(bc, r, t) {
 // computes new WorldState according keypress
 function control(ws, ks) {
   if (ks.ArrowUp || ks.ArrowDown || ks.ArrowLeft || ks.ArrowRight) {
-    return new WorldState(ws.sun, moveRocket(ws.player, ks), ws.time);
+    return new WorldState({
+      ...ws,
+      player: moveRocket(ws.player, ks)
+    });
   } else {
     return ws;
   }
@@ -110,22 +114,25 @@ function moveRocket(rocket, ke) {
   if (ke.ArrowUp)    ySpeed -= 1;
   if (ke.ArrowDown)  ySpeed += 1;
 
-  return new Rocket(rocket.pos.plus(new Vec(xSpeed, ySpeed)), rocket.v);
+  return new Rocket({
+    ...rocket,
+    pos: rocket.pos.plus(new Vec(xSpeed, ySpeed))
+  });
 }
 
 // WorldState -> WorldState
 // computes the next WorldState for every clock tick
 function tick(ws) {
   const newTime = ws.time + 1;
-  return new WorldState(
-    moveSolarSystem(ws.sun, newTime),
-    moveRocket(ws.player, newTime),
-    newTime
-  );
+  return new WorldState({
+    ...ws,
+    sun: moveSolarSystem(ws.sun, newTime),
+    time: newTime
+  });
 }
 
 // runs simulation from given WorldState
-function bigBang(ws, onDraw, onTick, onKey) {
+function bigBang({ ws, onDraw, onTick, onKey }) {
   const ks = (function(keys) {
     const keyStore = Object.create(null);
 

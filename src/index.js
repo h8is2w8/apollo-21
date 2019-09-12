@@ -39,11 +39,19 @@ CANVAS.style.height = WORLD_HEIGHT + 'px';
 CANVAS.style.border = '1px solid black';
 CANVAS.getContext('2d').scale(2,2);
 
-const PLAYER = new Rocket(new Vec(20, 20), new Vec(5, 5));
-const SCREEN = new Screen(CTX);
+const PLAYER = new Rocket({ pos: new Vec(20, 20), v: new Vec(5, 5) });
+const SCREEN = new Screen(CTX, WORLD_WIDTH, WORLD_HEIGHT);
 
 function draw(ws) {
   SCREEN.draw(ws);
 }
 
-bigBang(new WorldState(SUN, PLAYER, 0), draw, tick, control);
+bigBang({
+  ws: new WorldState({
+    sun: SUN, player: PLAYER,
+    time: 0, drawGrid: true
+  }),
+  onDraw: draw,
+  onTick: tick,
+  onKey: control
+});
