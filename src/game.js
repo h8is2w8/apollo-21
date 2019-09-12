@@ -47,6 +47,7 @@ class Rocket {
 }
 
 // Represents complete state of Space Flight game
+// - sun is a CelectialObject
 // - player is a Rocket
 // - time is a Number
 class WorldState {
