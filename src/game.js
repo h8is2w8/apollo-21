@@ -55,6 +55,8 @@ class WorldState {
     this.sun = sun;
     this.player = player;
     this.time = time;
+
+    moveSolarSystem(this.sun, time);
   }
 }
 
