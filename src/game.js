@@ -1,3 +1,10 @@
+// import { radToDeg } from 'helpers.js';
+
+// Constants
+
+const ORBIT_COLOR = 'black';
+
+
 // Structs
 
 class Vec {
@@ -11,6 +18,12 @@ class Vec {
   }
 }
 
+// Represents
+// - r is a Number
+// - orbitR is a Number
+// - color is a Color (define color enumerations)
+// - drawOrbits if a Bool
+// - satellites is an Array of CelestialObject
 class CelestialObject {
   constructor({ r, orbitR, color, drawOrbits = false, satellites = [] }) {
     this.r = r;
@@ -40,42 +53,6 @@ class WorldState {
     this.time = time;
   }
 }
-
-
-// Constants
-const CANVAS_WIDTH = 800;
-const CANVAS_HEIGHT = 800;
-const WORLD_WIDTH = CANVAS_WIDTH / 2;
-const WORLD_HEIGHT = CANVAS_HEIGHT / 2;
-
-const MOON  = new CelestialObject({ r: 5,  orbitR: 1, color: 'grey'  });
-const VENUS = new CelestialObject({ r: 8,  orbitR: 3, color: 'red'   });
-const MARS  = new CelestialObject({ r: 12, orbitR: 5, color: 'brown' });
-const EARTH = new CelestialObject({
-  r: 10, orbitR: 10, color: 'blue',
-  drawOrbits: true, satellites: [MOON]
-});
-const SUN   = new CelestialObject({
-  r: 25, orbitR: 40, color: 'orange',
-  drawOrbits: true,
-  satellites: [VENUS, EARTH, MARS, null]
-});
-
-const SUN_POS = new Vec(WORLD_WIDTH / 2, WORLD_HEIGHT / 2);
-const ORBIT_COLOR = 'black';
-
-// Preset World
-const CANVAS = document.getElementById('canvas');
-const CTX = CANVAS.getContext('2d');
-
-CANVAS.width = CANVAS_WIDTH;
-CANVAS.height = CANVAS_HEIGHT;
-CANVAS.style.width = WORLD_WIDTH + 'px';
-CANVAS.style.height = WORLD_HEIGHT + 'px';
-CANVAS.style.border = '1px solid black';
-CANVAS.getContext('2d').scale(2,2);
-
-const PLAYER = new Rocket(new Vec(20, 20), new Vec(5, 5));
 
 // WorldState is a Number
 // interpreation: representing the number of clock ticks
@@ -173,12 +150,6 @@ function draw(ws) {
   // drawGrid(0, WORLD_WIDTH, 0, WORLD_HEIGHT, 3);
 }
 
-// Number -> Number
-// converts radians to degrees
-function radToDeg(rad) {
-  return rad * 180 / Math.PI;
-}
-
 // Vec, Number, Number -> Vec
 // calcs satellite position given
 // Barrycenter  bc
@@ -191,8 +162,7 @@ function satellitePos(bc, r, t) {
   );
 }
 
-// Rocket -> Rocket
-// computes a new position of rocket
+// Rocket, KeyEvent -> Rocket
 function moveRocket(rocket) {
   return new Rocket(
     new Vec(rocket.pos.x + 1, rocket.pos.y + 1),
@@ -217,4 +187,45 @@ function bigBang(ws, onDraw, onTick) {
   });
 }
 
-bigBang(0, draw, tick);
+module.exports.Vec = Vec;
+module.exports.Rocket = Rocket;
+module.exports.CelestialObject = CelestialObject;
+module.exports.moveRocket = moveRocket;
+module.exports.bigBang = bigBang;
+
+
+// TODO: define orbital velocity computation
+// - https://en.wikipedia.org/wiki/Orbital_speed
+// - https://www.astronomynotes.com/gravappl/s8.htm
+//
+// IDEA: create it as part of Celestial Body Struct
+//
+// Body, Body -> Number
+// computes orbital velocity of a celectial body from the barrycenter and its distance.
+function orbitalVelocity(body, barrycenter, distance) {
+  // v = Math.sqrt(G * M / r)
+  // where M is barrycenter mass
+  //       G is a ?
+  //       r is a distance of a body from barrycenter
+  return 1;
+}
+
+// WorldState, KeyEvent -> WorldState
+function move(ws, ke) {
+  switch (ke) {
+    case 37: // arrow left
+
+      break;
+    case 38: // arrow up
+
+      break;
+    case 39: // arrow right
+
+      break;
+    case 40: // arrow down
+
+      break;
+    default:
+      return ws;
+  }
+}
