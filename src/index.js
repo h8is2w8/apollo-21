@@ -1,4 +1,10 @@
-import { bigBang, Rocket, CelestialObject, Vec } from 'game.js';
+import {
+  WorldState, Rocket,
+  CelestialObject, Vec,
+  bigBang, draw, tick
+} from './game.js';
+
+import Screen from './screen.js';
 
 // Constants
 const CANVAS_WIDTH = 800;
@@ -14,12 +20,11 @@ const EARTH = new CelestialObject({
   drawOrbits: true, satellites: [MOON]
 });
 const SUN   = new CelestialObject({
+  pos: new Vec(WORLD_WIDTH / 2, WORLD_HEIGHT / 2),
   r: 25, orbitR: 40, color: 'orange',
   drawOrbits: true,
   satellites: [VENUS, EARTH, MARS, null]
 });
-
-const SUN_POS = new Vec(WORLD_WIDTH / 2, WORLD_HEIGHT / 2);
 
 // Preset World
 const CANVAS = document.getElementById('canvas');
@@ -33,5 +38,10 @@ CANVAS.style.border = '1px solid black';
 CANVAS.getContext('2d').scale(2,2);
 
 const PLAYER = new Rocket(new Vec(20, 20), new Vec(5, 5));
+const SCREEN = new Screen(CTX);
 
-bigBang(new WorldState(PLAYER, 0), draw, tick);
+function drawWrold(ws) {
+  SCREEN.draw(ws);
+}
+
+bigBang(new WorldState(SUN, PLAYER, 0), drawWrold, tick);

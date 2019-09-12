@@ -4,7 +4,8 @@
   "description": "You are piloting a rocket across the solar system. This solar system includes a sun, three orbiting planets — the middle of which is Earth, your destination — and a moon orbiting Earth. You may assume that the planets and satellite follow a circular orbit, unless you know something about the geometry of orbits and want to make your program more realistic. You succeed by reaching Earth; you fail if hit any other heavenly body, or if you run out of fuel. (Oh, did we mention you have only a limited amount of fuel?)",
   "main": "game.js",
   "scripts": {
-    "build": "webpack",
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development --watch",
     "test": "jest"
   },
   "repository": {
