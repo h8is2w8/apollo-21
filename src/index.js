@@ -1,7 +1,7 @@
 import {
   WorldState, Rocket,
   CelestialObject, Vec,
-  bigBang, draw, tick
+  bigBang, tick
 } from './game.js';
 
 import Screen from './screen.js';
@@ -42,8 +42,8 @@ CANVAS.getContext('2d').scale(2,2);
 const PLAYER = new Rocket(new Vec(20, 20), new Vec(5, 5));
 const SCREEN = new Screen(CTX);
 
-function drawWrold(ws) {
+function draw(ws) {
   SCREEN.draw(ws);
 }
 
-bigBang(new WorldState(SUN, PLAYER, 0), drawWrold, tick);
+bigBang(new WorldState(SUN, PLAYER, 0), draw, tick);
