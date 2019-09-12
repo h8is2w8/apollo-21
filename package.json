@@ -1,0 +1,27 @@
+{
+  "name": "apollo-21",
+  "version": "1.0.0",
+  "description": "You are piloting a rocket across the solar system. This solar system includes a sun, three orbiting planets — the middle of which is Earth, your destination — and a moon orbiting Earth. You may assume that the planets and satellite follow a circular orbit, unless you know something about the geometry of orbits and want to make your program more realistic. You succeed by reaching Earth; you fail if hit any other heavenly body, or if you run out of fuel. (Oh, did we mention you have only a limited amount of fuel?)",
+  "main": "game.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/h8is2w8/apollo-21.git"
+  },
+  "keywords": [
+    "game",
+    "space",
+    "2d"
+  ],
+  "author": "h8is2w8",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/h8is2w8/apollo-21/issues"
+  },
+  "homepage": "https://github.com/h8is2w8/apollo-21#readme",
+  "devDependencies": {
+    "jest": "^24.9.0"
+  }
+}
