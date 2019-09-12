@@ -21,6 +21,26 @@ class CelestialObject {
   }
 }
 
+// Represents Rocket at position pos and velocity v
+// - pos is a Vec
+// - v is a Vec
+class Rocket {
+  constructor(pos, v) {
+    this.pos = pos;
+    this.v = v;
+  }
+}
+
+// Represents complete state of Space Flight game
+// - player is a Rocket
+// - time is a Number
+class WorldState {
+  constructor(player, time) {
+    this.player = player;
+    this.time = time;
+  }
+}
+
 
 // Constants
 const CANVAS_WIDTH = 800;
@@ -54,6 +74,8 @@ CANVAS.style.width = WORLD_WIDTH + 'px';
 CANVAS.style.height = WORLD_HEIGHT + 'px';
 CANVAS.style.border = '1px solid black';
 CANVAS.getContext('2d').scale(2,2);
+
+const PLAYER = new Rocket(new Vec(20, 20), new Vec(5, 5));
 
 // WorldState is a Number
 // interpreation: representing the number of clock ticks
@@ -120,25 +142,34 @@ function drawGrid(x1, x2, y1, y2, n) {
   drawGrid(midX, x2, midY, y2, n - 1); // 4rd square
 }
 
-function drawCelestialBody(obj, pos, ws) {
+function drawCelestialBody(obj, pos, time) {
   if (obj.drawOrbits) { drawOrbits(obj, pos) };
   drawCircle(pos.x, pos.y, obj.r, obj.color, true);
 
   obj.satellites.forEach(function(sat, i) {
     if (sat) {
       const distance = obj.r + obj.orbitR * (i + 1);
-      const speed = ws / (5000.0 * (i + 1));
+      const speed = time / (5000.0 * (i + 1));
       const sat_current_pos = satellitePos(pos, distance, speed);
-      drawCelestialBody(sat, sat_current_pos, ws * 5);
+      drawCelestialBody(sat, sat_current_pos, time * 5);
     }
   });
 }
 
+// draws rocket
+function drawRocket(rocket) {
+  CTX.beginPath();
+  // CTX.lineWidth = "6";
+  CTX.strokeStyle = "red";
+  CTX.rect(rocket.pos.x, rocket.pos.y, 20, 20);
+  CTX.stroke();
+}
 
 // draws world from WorldState
 function draw(ws) {
   clearWorld();
-  drawCelestialBody(SUN, SUN_POS, ws);
+  drawCelestialBody(SUN, SUN_POS, ws.time);
+  drawRocket(ws.player);
   // drawGrid(0, WORLD_WIDTH, 0, WORLD_HEIGHT, 3);
 }
 
@@ -160,10 +191,22 @@ function satellitePos(bc, r, t) {
   );
 }
 
+// Rocket -> Rocket
+// computes a new position of rocket
+function moveRocket(rocket) {
+  return new Rocket(
+    new Vec(rocket.pos.x + 1, rocket.pos.y + 1),
+    rocket.v
+  );
+}
+
 // WorldState -> WorldState
 // computes the next WorldState for every clock tick
 function tick(ws) {
-  return ws + 1;
+  return new WorldState(
+    moveRocket(ws.player),
+    ws.time + 1
+  );
 }
 
 // runs simulation from given WorldState
