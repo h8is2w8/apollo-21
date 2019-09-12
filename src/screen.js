@@ -3,10 +3,10 @@ import { drawCircle } from './helpers.js'
 const ORBIT_COLOR = 'black';
 
 export default class Screen {
-  constructor(ctx, sun, sun_pos) {
+  constructor(ctx, width, height) {
     this.ctx = ctx;
-    this.sun = sun;
-    this.sun_pos = sun_pos;
+    this.width = width;
+    this.height = height;
   }
 
   // draws world from WorldState
@@ -14,7 +14,7 @@ export default class Screen {
     this.clearWorld();
     this.drawCelestialBody(ws.sun, ws.sun.pos, ws.time);
     this.drawRocket(ws.player);
-    // this.drawGrid(0, WORLD_WIDTH, 0, WORLD_HEIGHT, 3);
+    if (ws.drawGrid) this.drawGrid(0, this.width, 0, this.height, 3);
   }
 
   // clears scene
@@ -56,10 +56,10 @@ export default class Screen {
     this.ctx.lineTo(midX, y2);
     this.ctx.stroke();
 
-    drawGrid(x1, midX, y1, midY, n - 1); // 1st square
-    drawGrid(midX, x2, y1, midY, n - 1); // 2nd square
-    drawGrid(x1, midX, midY, y2, n - 1); // 3rd square
-    drawGrid(midX, x2, midY, y2, n - 1); // 4rd square
+    this.drawGrid(x1, midX, y1, midY, n - 1); // 1st square
+    this.drawGrid(midX, x2, y1, midY, n - 1); // 2nd square
+    this.drawGrid(x1, midX, midY, y2, n - 1); // 3rd square
+    this.drawGrid(midX, x2, midY, y2, n - 1); // 4rd square
   }
 
   drawCelestialBody(obj, pos, time) {
