@@ -64,7 +64,7 @@ export default class Screen {
 
   drawCelestialBody(obj, pos, time) {
     if (obj.drawOrbits) { this.drawOrbits(obj, pos) };
-    drawCircle(this.ctx, pos.x, pos.y, obj.r, obj.color, true);
+    drawCircle(this.ctx, pos.x, pos.y, obj.r, obj.c, true);
 
     obj.satellites.forEach((sat, i) => {
       if (sat) {

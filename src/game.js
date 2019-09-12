@@ -16,13 +16,13 @@ class Vec {
 // Represents any celestial body
 // - Radius r is a Number
 // - Orbit radius orbitR is a Number
-// - color is a Color (define color enumerations)
+// - Color c is a HTML Color Name String
 // - Position pos is a Vec
 // - satellites is an Array of CelestialObject
-// - drawOrbits if a Bool
+// - drawOrbits is a Bool
 class CelestialObject {
   constructor({
-    r, orbitR, color,
+    r, orbitR, c,
     pos = new Vec(0, 0),
     satellites = [],
     drawOrbits = false
@@ -30,7 +30,7 @@ class CelestialObject {
     this.pos = pos;
     this.r = r;
     this.orbitR = orbitR;
-    this.color = color;
+    this.c = c;
     this.drawOrbits = drawOrbits;
     this.satellites = satellites;
   }
