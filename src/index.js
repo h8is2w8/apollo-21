@@ -1,7 +1,7 @@
 import {
   WorldState, Rocket,
   CelestialObject, Vec,
-  bigBang, tick
+  bigBang, tick, control
 } from './game.js';
 
 import Screen from './screen.js';
@@ -46,4 +46,4 @@ function draw(ws) {
   SCREEN.draw(ws);
 }
 
-bigBang(new WorldState(SUN, PLAYER, 0), draw, tick);
+bigBang(new WorldState(SUN, PLAYER, 0), draw, tick, control);
