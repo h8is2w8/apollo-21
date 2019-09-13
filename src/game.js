@@ -1,20 +1,14 @@
-import { radToDeg } from './helpers.js';
+import { radToDeg, degToRad } from './helpers';
+import Vec from './vec';
 
 // Constants
 const TRACKED_KEYS = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+const ROTATION_SPEED = degToRad(3); // Rocket rotation speed in radians
+const MIN_SPEED = 0;
+const MAX_SPEED = 2;
+const DEFAULT_POS = new Vec(1, 0);
 
 // Structs
-
-class Vec {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-  }
-
-  plus(other) {
-    return new Vec(this.x + other.x, this.y + other.y);
-  }
-}
 
 // Represents any celestial body
 // - Radius r is a Number
@@ -39,13 +33,27 @@ class CelestialObject {
   }
 }
 
-// Represents Rocket at position pos and velocity v
-// - pos is a Vec
-// - v is a Vec
+// Represents Rocket with
+// position  pos is a Vec
+// direction dir is a Vec
+// speed is a Number
+// color c is a HTML Color Name String
 class Rocket {
-  constructor({ pos, v }) {
+  constructor({
+    pos, dir = DEFAULT_POS,
+    speed = MIN_SPEED, c = "navy"
+  }) {
     this.pos = pos;
-    this.v = v;
+    this.dir = dir;
+    this.speed = speed;
+    this.c = c;
+  }
+
+  nextPos() {
+    return new Rocket({
+      ...this,
+      pos: this.pos.plus(this.dir.mult(this.speed))
+    });
   }
 }
 
@@ -53,6 +61,7 @@ class Rocket {
 // - sun is a CelectialObject
 // - player is a Rocket
 // - time is a Number
+// - drawGrid is Bool
 class WorldState {
   constructor({ sun, player, time, drawGrid = false }) {
     this.sun = sun;
@@ -96,7 +105,7 @@ function control(ws, ks) {
   if (ks.ArrowUp || ks.ArrowDown || ks.ArrowLeft || ks.ArrowRight) {
     return new WorldState({
       ...ws,
-      player: moveRocket(ws.player, ks)
+      player: updateRocketVel(ws.player, ks)
     });
   } else {
     return ws;
@@ -104,19 +113,23 @@ function control(ws, ks) {
 }
 
 // Rocket, KeyEvent -> Rocket
-// computes new position for Rocket according to pressed keys
-function moveRocket(rocket, ke) {
-  let xSpeed = 0;
-  let ySpeed = 0;
+// computes speed and direction for Rocket according to pressed keys
+function updateRocketVel(rocket, ke) {
+  let deltaDeg = 0;
+  let deltaMag = 0;
 
-  if (ke.ArrowLeft)  xSpeed -= 1;
-  if (ke.ArrowRight) xSpeed += 1;
-  if (ke.ArrowUp)    ySpeed -= 1;
-  if (ke.ArrowDown)  ySpeed += 1;
+  if (ke.ArrowLeft)  deltaDeg -= ROTATION_SPEED;
+  if (ke.ArrowRight) deltaDeg += ROTATION_SPEED;
+  if (ke.ArrowDown)  deltaMag -= 1;
+  if (ke.ArrowUp)    deltaMag += 1;
+
+  const dir = rocket.dir.rotate(deltaDeg);
+  const newSpeed = rocket.speed + deltaMag;
 
   return new Rocket({
     ...rocket,
-    pos: rocket.pos.plus(new Vec(xSpeed, ySpeed))
+    dir: dir,
+    speed: newSpeed < MIN_SPEED ? MIN_SPEED : Math.min(newSpeed, MAX_SPEED)
   });
 }
 
@@ -127,6 +140,7 @@ function tick(ws) {
   return new WorldState({
     ...ws,
     sun: moveSolarSystem(ws.sun, newTime),
+    player: ws.player.nextPos(),
     time: newTime
   });
 }

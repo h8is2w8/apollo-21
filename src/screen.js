@@ -73,12 +73,20 @@ export default class Screen {
     });
   }
 
-  // draws rocket
   drawRocket(rocket) {
+    this.ctx.save();
+
+    this.ctx.translate(rocket.pos.x, rocket.pos.y);
+    this.ctx.rotate(rocket.dir.tetha());
+    this.ctx.translate(-rocket.pos.x, -rocket.pos.y);
+
     this.ctx.beginPath();
-    // CTX.lineWidth = "6";
-    this.ctx.strokeStyle = "red";
-    this.ctx.rect(rocket.pos.x, rocket.pos.y, 20, 20);
-    this.ctx.stroke();
+    this.ctx.moveTo(rocket.pos.x + 15, rocket.pos.y);
+    this.ctx.lineTo(rocket.pos.x - 15, rocket.pos.y - 10);
+    this.ctx.lineTo(rocket.pos.x - 15, rocket.pos.y + 10);
+    this.ctx.fillStyle = rocket.c;
+    this.ctx.fill();
+
+    this.ctx.restore();
   }
 }

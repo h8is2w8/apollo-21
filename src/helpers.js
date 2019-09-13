@@ -4,6 +4,12 @@ function radToDeg(rad) {
   return rad * 180 / Math.PI;
 }
 
+// Number -> Number
+// converts degrees to radians
+function degToRad(deg) {
+  return deg * Math.PI / 180;
+}
+
 // draws circle given
 // Canvas ctx
 // Pos    x, y
@@ -22,4 +28,4 @@ function drawCircle(ctx, x, y, r, c, f) {
   }
 }
 
-export { radToDeg, drawCircle }
+export { radToDeg, degToRad, drawCircle }
