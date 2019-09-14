@@ -12,7 +12,7 @@ export default class Screen {
   // draws world from WorldState
   draw(ws) {
     this.clearWorld();
-    this.drawCelestialBody(ws.sun, ws.sun.pos, ws.time);
+    this.drawCelestialObject(ws.sun);
     this.drawRocket(ws.player);
     if (ws.drawGrid) this.drawGrid(0, this.width, 0, this.height, 3);
   }
@@ -23,11 +23,11 @@ export default class Screen {
   }
 
   // draws orbits around an obj
-  drawOrbits(obj, pos) {
+  drawOrbits(obj) {
     for (let i = 1; i <= obj.satellites.length; i++) {
       drawCircle(
         this.ctx,
-        pos.x, pos.y,
+        obj.pos.x, obj.pos.y,
         obj.r + obj.orbitR * i,
         ORBIT_COLOR,
         false
@@ -62,24 +62,21 @@ export default class Screen {
     this.drawGrid(midX, x2, midY, y2, n - 1); // 4rd square
   }
 
-  drawCelestialBody(obj, pos, time) {
-    if (obj.drawOrbits) { this.drawOrbits(obj, pos) };
-    drawCircle(this.ctx, pos.x, pos.y, obj.r, obj.c, true);
-
-    obj.satellites.forEach((sat, i) => {
-      if (sat) {
-        this.drawCelestialBody(sat, sat.pos, time * 5);
-      }
-    });
+  drawCelestialObject(obj) {
+    if (obj.drawOrbits) { this.drawOrbits(obj) };
+    drawCircle(this.ctx, obj.pos.x, obj.pos.y, obj.r, obj.c, true);
+    obj.satellites.filter(Boolean).forEach(this.drawCelestialObject.bind(this));
   }
 
   drawRocket(rocket) {
     this.ctx.save();
 
+    // rotate rocket according to its current direction
     this.ctx.translate(rocket.pos.x, rocket.pos.y);
     this.ctx.rotate(rocket.dir.tetha);
     this.ctx.translate(-rocket.pos.x, -rocket.pos.y);
 
+    // draw rocket
     this.ctx.beginPath();
     this.ctx.moveTo(rocket.pos.x + 15, rocket.pos.y);
     this.ctx.lineTo(rocket.pos.x - 15, rocket.pos.y - 10);
