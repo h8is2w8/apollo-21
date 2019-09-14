@@ -4,8 +4,12 @@ class Vec {
     this.y = y;
   }
 
-  mag() {
+  get mag() {
     return Math.sqrt(this.x ** 2 + this.y ** 2);
+  }
+
+  get tetha() {
+    return Math.atan2(this.y, this.x);
   }
 
   plus(other) {
@@ -20,12 +24,8 @@ class Vec {
     return new Vec(this.x / factor, this.y / factor);
   }
 
-  tetha() {
-    return Math.atan2(this.y, this.x);
-  }
-
   normalize() {
-    const m = this.mag();
+    const m = this.mag;
     if (m != 0 && m != 1) {
       return this.div(m);
     } else {

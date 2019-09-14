@@ -77,7 +77,7 @@ export default class Screen {
     this.ctx.save();
 
     this.ctx.translate(rocket.pos.x, rocket.pos.y);
-    this.ctx.rotate(rocket.dir.tetha());
+    this.ctx.rotate(rocket.dir.tetha);
     this.ctx.translate(-rocket.pos.x, -rocket.pos.y);
 
     this.ctx.beginPath();
