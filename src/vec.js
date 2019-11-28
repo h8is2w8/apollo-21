@@ -1,4 +1,4 @@
-class Vec {
+export default class Vec {
   constructor(x, y) {
     this.x = x;
     this.y = y;
@@ -14,6 +14,14 @@ class Vec {
 
   plus(other) {
     return new Vec(this.x + other.x, this.y + other.y);
+  }
+
+  minus(other) {
+    return new Vec(this.x - other.x, this.y - other.y);
+  }
+
+  dot(other) {
+    return this.x * other.x + this.y * other.y;
   }
 
   mult(factor) {

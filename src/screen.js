@@ -1,10 +1,20 @@
 import { drawCircle } from './helpers.js'
 
 const ORBIT_COLOR = 'black';
+const GRID_COLOR  = 'grey';
 
 export default class Screen {
-  constructor(ctx, width, height) {
-    this.ctx = ctx;
+  constructor(canvas, width, height) {
+    this.canvas = canvas;
+    this.canvas.width = width * 2;
+    this.canvas.height = height * 2;
+    this.canvas.style.width = width + 'px';
+    this.canvas.style.height = height + 'px';
+    this.canvas.style.border = '1px solid black';
+
+    this.ctx = this.canvas.getContext('2d');
+    this.ctx.scale(2,2);
+
     this.width = width;
     this.height = height;
   }
@@ -13,7 +23,7 @@ export default class Screen {
   draw(ws) {
     this.clearWorld();
     this.drawCelestialObject(ws.sun);
-    this.drawRocket(ws.player);
+    this.drawRocket(ws.rocket);
     if (ws.drawGrid) this.drawGrid(0, this.width, 0, this.height, 3);
   }
 
@@ -42,7 +52,7 @@ export default class Screen {
     let midX = x1 + (x2 - x1) / 2;
     let midY = y1 + (y2 - y1) / 2;
 
-    this.ctx.strokeStyle = 'grey';
+    this.ctx.strokeStyle = GRID_COLOR;
 
     // draw horizontal line
     this.ctx.beginPath();
@@ -64,26 +74,20 @@ export default class Screen {
 
   drawCelestialObject(obj) {
     if (obj.drawOrbits) { this.drawOrbits(obj) };
-    drawCircle(this.ctx, obj.pos.x, obj.pos.y, obj.r, obj.c, true);
+    drawCircle(this.ctx, obj.pos.x, obj.pos.y, obj.r, obj.color, true);
     obj.satellites.filter(Boolean).forEach(this.drawCelestialObject.bind(this));
   }
 
   drawRocket(rocket) {
-    this.ctx.save();
+    const{p1, p2, p3} = rocket;
 
-    // rotate rocket according to its current direction
-    this.ctx.translate(rocket.pos.x, rocket.pos.y);
-    this.ctx.rotate(rocket.dir.tetha);
-    this.ctx.translate(-rocket.pos.x, -rocket.pos.y);
-
-    // draw rocket
     this.ctx.beginPath();
-    this.ctx.moveTo(rocket.pos.x + 15, rocket.pos.y);
-    this.ctx.lineTo(rocket.pos.x - 15, rocket.pos.y - 10);
-    this.ctx.lineTo(rocket.pos.x - 15, rocket.pos.y + 10);
-    this.ctx.fillStyle = rocket.c;
-    this.ctx.fill();
 
-    this.ctx.restore();
+    this.ctx.moveTo(p1.x, p1.y);
+    this.ctx.lineTo(p2.x, p2.y);
+    this.ctx.lineTo(p3.x, p3.y);
+
+    this.ctx.fillStyle = rocket.color;
+    this.ctx.fill();
   }
 }
