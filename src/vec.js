@@ -47,6 +47,14 @@ export default class Vec {
       this.x * Math.sin(tetha) + this.y * Math.cos(tetha)
     )
   }
-}
 
-module.exports = Vec;
+  project(other) {
+    const dir = other.normalize();
+    let dist = dir.dot(this);
+
+    if (dist < 0) dist = 0;
+    if (dist > other.mag) dist = other.mag;
+
+    return dir.mult(dist);
+  }
+}
