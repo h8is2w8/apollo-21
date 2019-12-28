@@ -46,11 +46,12 @@ function Rocket({
 }
 
 function CelestialObject({
-  r, orbitR, color,
+  name, r, orbitR, color,
   pos        = new Vec(0, 0),
   drawOrbits = false,
   satellites = []
 }) {
+  this.name = name;
   this.r   = r;
   this.pos = pos;
   this.color = color;
@@ -170,18 +171,20 @@ bigBang({
       p3: new Vec(120, 105)
     }),
     sun: new CelestialObject({
+      name: 'Sun',
       pos: new Vec(WORLD_WIDTH / 2, WORLD_HEIGHT / 2),
       r: 25, orbitR: 40, color: 'orange',
       drawOrbits: true,
       satellites: [
-        new CelestialObject({ r: 8, orbitR: 3, color: 'red' }),
+        new CelestialObject({ name: 'Venus', r: 8, orbitR: 3, color: 'red' }),
         new CelestialObject({
-          r: 10, orbitR: 10, color: 'blue', drawOrbits: true,
+          name: 'Earth', r: 10, orbitR: 10, color: 'blue',
+          drawOrbits: true,
           satellites: [
-            new CelestialObject({ r: 5, orbitR: 1, color: 'grey' })
+            new CelestialObject({ name: 'Moon', r: 5, orbitR: 1, color: 'grey' })
           ]
         }),
-        new CelestialObject({ r: 12, orbitR: 5, color: 'brown' }),
+        new CelestialObject({ name: 'Jupiter', r: 12, orbitR: 5, color: 'brown' }),
       ]
     })
   }),
